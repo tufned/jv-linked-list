@@ -3,14 +3,14 @@ package core.basesyntax;
 import java.util.List;
 
 public class MyLinkedList<T> implements MyLinkedListInterface<T> {
-    private MyNode<T> tail;
-    private MyNode<T> head;
+    private Node<T> tail;
+    private Node<T> head;
     private int size;
 
     @Override
     public void add(T value) {
-        MyNode<T> last = tail;
-        MyNode<T> node = new MyNode<>(last, value, null);
+        Node<T> last = tail;
+        Node<T> node = new Node<>(last, value, null);
         tail = node;
         if (last == null) {
             head = node;
@@ -27,10 +27,8 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
             add(value);
             return;
         }
-        MyNode<T> currentNode = findByIndex(index);
-        MyNode<T> newNode = new MyNode<>(currentNode.prev, value, currentNode);
-        newNode.prev = currentNode.prev;
-        newNode.next = currentNode;
+        Node<T> currentNode = findByIndex(index);
+        Node<T> newNode = new Node<>(currentNode.prev, value, currentNode);
         if (currentNode.prev == null) {
             head = newNode;
         } else {
@@ -50,7 +48,7 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     @Override
     public T get(int index) {
         checkIndex(index);
-        MyNode<T> node = findByIndex(index);
+        Node<T> node = findByIndex(index);
         if (node != null) {
             return node.item;
         }
@@ -60,7 +58,7 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     @Override
     public T set(T value, int index) {
         checkIndex(index);
-        MyNode<T> node = findByIndex(index);
+        Node<T> node = findByIndex(index);
         T oldValue = node.item;
         node.item = value;
         return oldValue;
@@ -69,14 +67,15 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
     @Override
     public T remove(int index) {
         checkIndex(index);
-        MyNode<T> node = findByIndex(index);
+        Node<T> node = findByIndex(index);
+        T item = node.item;
         unlink(node);
-        return node.item;
+        return item;
     }
 
     @Override
     public boolean remove(T object) {
-        MyNode<T> currentNode = head;
+        Node<T> currentNode = head;
         for (int i = 0; i < size; i++) {
             T item = currentNode.item;
             if (item == object || (item != null && item.equals(object))) {
@@ -100,7 +99,7 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
         return size == 0;
     }
 
-    private void unlink(MyNode<T> node) {
+    private void unlink(Node<T> node) {
         if (node.prev != null) {
             node.prev.next = node.next;
         } else {
@@ -113,12 +112,16 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
             tail = node.prev;
         }
 
+        node.item = null;
+        node.prev = null;
+        node.next = null;
+
         size--;
     }
 
-    private MyNode<T> findByIndex(int index) {
+    private Node<T> findByIndex(int index) {
         if (index < size / 2) {
-            MyNode<T> currentNode = head;
+            Node<T> currentNode = head;
             for (int i = 0; i < size; i++) {
                 if (index == i) {
                     return currentNode;
@@ -126,8 +129,8 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
                 currentNode = currentNode.next;
             }
         } else {
-            MyNode<T> currentNode = tail;
-            for (int i = size - 1; i >= 0 ; i--) {
+            Node<T> currentNode = tail;
+            for (int i = size - 1; i >= 0; i--) {
                 if (index == i) {
                     return currentNode;
                 }
@@ -149,12 +152,12 @@ public class MyLinkedList<T> implements MyLinkedListInterface<T> {
         }
     }
 
-    private static class MyNode<E> {
-        E item;
-        MyNode<E> prev;
-        MyNode<E> next;
+    private static class Node<E> {
+        private E item;
+        private Node<E> prev;
+        private Node<E> next;
 
-        public MyNode(MyNode<E> prev, E item, MyNode<E> next) {
+        public Node(Node<E> prev, E item, Node<E> next) {
             this.prev = prev;
             this.item = item;
             this.next = next;
